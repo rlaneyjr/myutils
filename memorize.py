@@ -33,7 +33,7 @@ no information will be cached and no memoization will
 take place.
 """
 import pickle
-import collections
+#import collections
 import functools
 import inspect
 import os.path
@@ -43,7 +43,7 @@ import unicodedata
 
 # This configures the place to store cache files globally.
 # Set it to False to store cache files next to files for which function calls are cached.
-USE_CURRENT_DIR = True
+USE_CURRENT_DIR = False
 
 
 class Memorize(object):
