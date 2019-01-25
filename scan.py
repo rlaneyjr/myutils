@@ -1,11 +1,35 @@
+#!/usr/bin/env python
+
+from myutils.mytools import get_input
 import time
 from random import randrange
 import threading
 import requests
+import ipaddress as ip
 from pymongo import MongoClient
 
 some_database = MongoClient().some_database
 some_collection = some_database.some_collection
+
+
+def get_network():
+    net = get_input("Please provide the network you wish to scan (ex. 192.168.20.0/24): ")
+    try:
+        network = ip.IPv4Network(net)
+    except ["AddressValueError", "NetmaskValueError", "ValueError"] as e:
+        print(f"You screwed up somewhere!\n{e}\nTry again!\n")
+        get_network()
+    return network
+
+
+'''
+AddressValueError: If ipaddress isn't a valid IPv4 address.
+NetmaskValueError: If the netmask isn't valid for
+  an IPv4 address.
+ValueError: If strict is True and a network address is not
+  supplied.
+'''
+
 
 def randhost():
     a = randrange(256)
@@ -13,6 +37,10 @@ def randhost():
     c = randrange(256)
     d = randrange(256)
     return '%i.%i.%i.%i' % (a, b, c, d)
+
+def host_countdown(net_begin=None):
+    if net_begin:
+        subnet_begin = net_begin.split('.0')[0]
 
 def process(host, port):
     if port == 80:
