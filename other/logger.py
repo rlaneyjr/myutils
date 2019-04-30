@@ -21,9 +21,9 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)  # KeyboardInterrupt: Ctrl-C
 FORMAT = '%(asctime)s: %(levelname)s: %(lineno)d: %(message)s'
 FORMAT1 = '%(asctime)s:%(name)s:%(message)s'
 
-logging.basicConfig(filename=log_file, filemode='w',
-        format=FORMAT, level=logging.INFO)
-logger = logging.getLogger('repo_up')
+# logging.basicConfig(filename=log_file, filemode='w',
+#         format=FORMAT, level=logging.INFO)
+# logger = logging.getLogger('repo_up')
 
 #log = logging.getLogger(__name__)
 #log.setLevel(logging.DEBUG)
@@ -48,12 +48,11 @@ class Logger(logging.getLoggerClass()):
         # Use specified log_dir or the default one
         default_log_dir = os.path.join(self.get_log_dir(), self.log_name)
         self.log_dir = log_dir if log_dir else default_log_dir
-        self.log_file = get_log_file()
         # Configure the logger
         self.configure()
 
-    def __get__(self):
-        return self
+    # def __get__(self):
+    #     return self
 
     def configure(self):
         """Configure the logger object."""
@@ -73,6 +72,7 @@ class Logger(logging.getLoggerClass()):
         self.addHandler(file_handler)
         logging.getLogger('').addHandler(file_handler)
 
+    @property
     def get_log_file(self):
         """Returns the requested filename or tries to determine the best name
         by using the executed filename or function name. Fallsback to a date
@@ -109,7 +109,7 @@ class Logger(logging.getLoggerClass()):
             os.makedirs(name)
 
 
-class log_with(object):
+class LogWith():
     '''Logging decorator that allows you to log with a specific logger.
     '''
     # Customize these messages
@@ -142,7 +142,7 @@ class log_with(object):
             log_suffix = '.log'
             log_prefix = str(func.__name__)
             log_name = "{}_{}{}".format(log_prefix, tday, log_suffix)
-            log_file = log_dir + log_name
+            log_file = os.path.join(log_dir, log_name)
             no_files = str(len([n for n in os.listdir(log_dir) if n == log_name]))
             if not os.path.exists(log_file):
                 log_file = log_file
@@ -155,8 +155,8 @@ class log_with(object):
             f_result = func(*args, **kwds)
             end_time = dt.datetime.now()
             self.logger.info(self.EXIT_MESSAGE.format(func.__name__, end_time))
-            self.logger.info("FUNC: {} TIME: {}".format(func.__name__,
-                                                      (end_time - start_time)))
+            self.logger.info("Function: {}, Time taken: {}".format(func.__name__,
+                                                        (end_time - start_time)))
             return f_result
         return wrapper
 
@@ -168,12 +168,12 @@ if __name__ == '__main__':
     log.setLevel(logging.DEBUG)
     log.info('ciao')
 
-    @log_with(log)     # user specified logger
+    @LogWith(log)     # user specified logger
     def foo():
         print 'this is foo'
     foo()
 
-    @log_with()        # using default logger
+    @LogWith()        # using default logger
     def foo2():
         print 'this is foo2'
     foo2()

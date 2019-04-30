@@ -12,8 +12,8 @@
 from __future__ import absolute_import, division, print_function
 
 from getpass import getpass
-import logging
-import os
+#import logging
+#import os
 import signal
 import sys
 import time
@@ -91,5 +91,4 @@ def timerfunc(func):
         print(msg.format(func=func.__name__, time=runtime))
         return value
     return function_timer
-
 

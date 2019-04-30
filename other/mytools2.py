@@ -3,6 +3,13 @@
 from __future__ import absolute_import, division, print_function
 
 from getpass import getpass
+import signal
+import sys
+import time
+
+
+sig1 = signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # IOError: Broken pipe
+sig2 = signal.signal(signal.SIGINT, signal.SIG_DFL)  # KeyboardInterrupt: Ctrl-C
 
 
 def get_input(prompt=''):
