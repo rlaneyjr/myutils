@@ -12,8 +12,8 @@
 from __future__ import absolute_import, division, print_function
 
 from getpass import getpass
-#import logging
-#import os
+import logging
+import os
 import signal
 import sys
 import time
@@ -91,4 +91,49 @@ def timerfunc(func):
         print(msg.format(func=func.__name__, time=runtime))
         return value
     return function_timer
+
+
+def select_editor(file_name, line_num=None):
+    # Choices to open the file with.
+    print("\n\t0) None\n\t1) Vim\n\t2) Sublime\n\t3) VSCode\n\t4) PyCharm\n\t5) MacVim\n\n")
+    _pwd = os.getcwd()
+    editor = get_input("Select a number: ")
+    if editor == "0":
+        exit()
+    elif editor == "1":
+        if line_num:
+            os.system(f"vim +{line_num} {file_name}")
+            exit()
+        else:
+            os.system(f"vim {file_name}")
+            exit()
+    elif editor == "2":
+        os.system(f"subl -n -a {_pwd} {file_name}")
+        exit()
+    elif editor == "3":
+        if line_num:
+            os.system(f"code -n -a {_pwd} -g {file_name}:{line_num}")
+            exit()
+        else:
+            os.system(f"code -n -a {_pwd} -g {file_name}")
+            exit()
+    elif editor == "4":
+        if line_num:
+            os.system(f"charm {_pwd} {file_name}:{line_num}")
+            exit()
+        else:
+            os.system(f"charm {_pwd} {file_name}")
+            exit()
+    elif editor == "5":
+        if line_num:
+            os.system(f"mvim +{line_num} {file_name}")
+            exit()
+        else:
+            os.system(f"mvim {file_name}")
+            exit()
+    else:
+        os.system("clear")
+        print("\nDo WhAt?\n")
+        print("Press <Ctrl + C> to quit.\n")
+        return select_editor()
 
