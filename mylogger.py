@@ -16,6 +16,17 @@ import signal
 import sys
 import warnings
 
+# How to import tqdm without enforcing it as a dependency
+try:
+    from tqdm import tqdm
+except ImportError:
+
+    def tqdm(*args, **kwargs):
+        if args:
+            return args[0]
+        return kwargs.get('iterable', None)
+
+
 # Stops the ugly errors when hitting 'Ctrl+C'
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)  # IOError: Broken pipe
 signal.signal(signal.SIGINT, signal.SIG_DFL)  # KeyboardInterrupt: Ctrl-C
@@ -38,6 +49,23 @@ if not os.path.exists(log_file):
     log_file = log_file
 else:
     log_file = log_prefix + tday + '_' + no_files + log_suffix
+
+
+class TqdmLoggingHandler(logging.Handler):
+    """ Custom Log Handler for use with TQDM
+    """
+    def __init__(self, level = logging.NOTSET):
+        super(self.__class__, self).__init__(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg)
+            self.flush()
+        except (KeyboardInterrupt, SystemExit) as exc:
+            raise exc
+        except:
+            self.handleError(record)
 
 
 class LogWith(object):
