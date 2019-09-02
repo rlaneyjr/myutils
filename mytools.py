@@ -12,10 +12,11 @@
 from __future__ import absolute_import, division, print_function
 
 from getpass import getpass
-import logging
+#import logging
 import os
 import signal
 import sys
+from subprocess import getoutput
 import time
 
 
@@ -93,47 +94,60 @@ def timerfunc(func):
     return function_timer
 
 
-def select_editor(file_name, line_num=None):
+def select_editor(file_to_edit, lineno=0):
     # Choices to open the file with.
-    print("\n\t0) None\n\t1) Vim\n\t2) Sublime\n\t3) VSCode\n\t4) PyCharm\n\t5) MacVim\n\n")
-    _pwd = os.getcwd()
+    CHOICES = """
+            0) None
+            1) Vim
+            2) Sublime
+            3) VSCode
+            4) PyCharm
+            5) MacVim
+            """
+    choice_map = {
+            0: 'None',
+            1: 'Vim',
+            2: 'Sublime',
+            3: 'VSCode',
+            4: 'PyCharm',
+            5: 'MacVim'
+    }
+    _cwd = os.getcwd()
+    print(CHOICES)
+    # grab the line number after header while the user is thinking
+    # Also creates the file if it does not exist
+    with open(file_to_edit, 'w+') as f:
+        lineno = 0
+        lines = f.readlines()
+        no_lines = len(lines)
+        for line in lines:
+            if line.startswith(('#', ' ')):
+                lineno += 1
+    lineno = lineno if lineno <= no_lines else no_lines
     editor = get_input("Select a number: ")
     if editor == "0":
         exit()
     elif editor == "1":
-        if line_num:
-            os.system(f"vim +{line_num} {file_name}")
-            exit()
-        else:
-            os.system(f"vim {file_name}")
-            exit()
+        os.system(f"vim +{lineno} {file_to_edit}")
+        exit()
     elif editor == "2":
-        os.system(f"subl -n -a {_pwd} {file_name}")
+        os.system(f"subl -n -a {_cwd} {file_to_edit}")
         exit()
     elif editor == "3":
-        if line_num:
-            os.system(f"code -n -a {_pwd} -g {file_name}:{line_num}")
-            exit()
-        else:
-            os.system(f"code -n -a {_pwd} -g {file_name}")
-            exit()
+        os.system(f"code -n -a {_cwd} -g {file_to_edit}:{lineno}")
+        exit()
     elif editor == "4":
-        if line_num:
-            os.system(f"charm {_pwd} {file_name}:{line_num}")
-            exit()
-        else:
-            os.system(f"charm {_pwd} {file_name}")
-            exit()
+        os.system(f"charm {_cwd} {file_to_edit}:{lineno}")
+        exit()
     elif editor == "5":
-        if line_num:
-            os.system(f"mvim +{line_num} {file_name}")
-            exit()
-        else:
-            os.system(f"mvim {file_name}")
-            exit()
+        os.system(f"mvim +{lineno} {file_to_edit}")
+        exit()
+    elif editor == "6":
+        os.system(f"atom -n {file_to_edit}")
+        exit()
     else:
         os.system("clear")
-        print("\nDo WhAt?\n")
+        print("\nI do not understand your answer.\n")
         print("Press <Ctrl + C> to quit.\n")
         return select_editor()
 

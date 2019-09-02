@@ -37,19 +37,6 @@ FORMAT1 = '%(asctime)s:%(name)s:%(message)s'
 #log = logging.getLogger(__name__)
 #log.setLevel(logging.DEBUG)
 
-tday = dt.date.today().strftime('%m-%d-%Y')
-log_dir = '/Users/rlaney/Logs/'
-log_suffix = '.log'
-log_prefix = str(os.path.basename(__file__)).split('.')[0]
-log_name = "{}_{}{}".format(log_prefix, tday, log_suffix)
-log_file = log_dir + log_name
-no_files = str(len([n for n in os.listdir(log_dir) if n == log_name]))
-
-if not os.path.exists(log_file):
-    log_file = log_file
-else:
-    log_file = log_prefix + tday + '_' + no_files + log_suffix
-
 
 class TqdmLoggingHandler(logging.Handler):
     """ Custom Log Handler for use with TQDM
@@ -68,7 +55,7 @@ class TqdmLoggingHandler(logging.Handler):
             self.handleError(record)
 
 
-class LogWith(object):
+class LogWith:
     '''Logging decorator that allows you to log with a specific logger.
     '''
     # Customize these messages
@@ -76,8 +63,9 @@ class LogWith(object):
     EXIT_MESSAGE = 'Exiting {} at {}'
 
     def __init__(self, logger=None):
+        self.name = logger
         self.logger = logging.getLogger(logger)
-        self.logger = logging.basicConfig(filename=log_file, filemode='w',
+        self.logger = logging.basicConfig(filename=get_log_file(), filemode='w',
                                           format=FORMAT, level=logging.INFO)
 
     def __call__(self, func):
@@ -90,6 +78,21 @@ class LogWith(object):
                 self.logger = logging.getLogger(os.path.basename(__file__))
             except:
                 self.logger = logging.getLogger(func.__module__)
+
+    def get_log_file(self):
+        tday = dt.date.today().strftime('%m-%d-%Y')
+        log_dir = '/Users/rlaney/Logs/'
+        log_suffix = '.log'
+        if self.name:
+            log_prefix = str(self.name)
+        else:
+            log_prefix = str(os.path.basename(__file__)).split('.')[0]
+        log_name = f"{log_prefix}_{tday}{log_suffix}"
+        no_files = str(len([n for n in os.listdir(log_dir) if n == log_name]))
+        if not os.path.exists(log_file):
+            return log_dir + log_name
+        else:
+            return log_prefix + tday + '_' + no_files + log_suffix
 
         @wraps(func)
         def wrapper(*args, **kwds):
