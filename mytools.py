@@ -115,17 +115,11 @@ def select_editor(file_to_edit, lineno=0):
     _cwd = os.getcwd()
     print(CHOICES)
     # grab the line number after header while the user is thinking
-    # Also creates the file if it does not exist
-    with open(file_to_edit, 'w+') as f:
-        lineno = 0
+    with open(file_to_edit, 'r') as f:
         lines = f.readlines()
-        no_lines = len(lines)
-        for line in lines:
-            if line.startswith(('#', ' ')):
-                lineno += 1
-    lineno = lineno if lineno <= no_lines else no_lines
+        lineno = len(lines)
     editor = get_input("Select a number: ")
-    if editor == "0":
+    if not editor or editor == "0":
         exit()
     elif editor == "1":
         os.system(f"vim +{lineno} {file_to_edit}")
