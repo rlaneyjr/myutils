@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: noai:et:tw=80:ts=4:ss=4:sts=4:sw=4:ft=python
 
 import argparse
 import os
@@ -16,18 +18,31 @@ def convertFile(inputFile, outputFile):
   fileName, fileExtensionOutput = os.path.splitext(outputFile)
 
   if fileExtensionInput == ".yaml" and fileExtensionOutput == ".json":
-    convertYamlJson (inputFile, outputFile)
+    convertYamlJson(inputFile, outputFile)
 
   if fileExtensionInput == ".json" and fileExtensionOutput == ".yaml":
-    convertJsonYaml (inputFile, outputFile)
+    convertJsonYaml(inputFile, outputFile)
 
   if fileExtensionInput == ".json" and fileExtensionOutput == ".xml":
-    convertJsonXml (inputFile, outputFile)
+    convertJsonXml(inputFile, outputFile)
 
-"""
-Convert from Json to Yaml
-"""
+  if fileExtensionInput == ".xml" and fileExtensionOutput == ".json":
+    convertXmlJson(inputFile, outputFile)
+
+  if fileExtensionOutput is None:
+    fileType = fileExtensionInput.lstrip('.')
+    prettyprint(inputFile, outputFile, fileType)
+
+def prettyprint(inputFile, outputFile, fileType):
+    """
+    Convert from Json to Yaml
+    """
+
+
 def convertJsonYaml(inputFile, outputFile):
+    """
+    Convert from Json to Yaml
+    """
   with open(inputFile, 'r') as stream:
     yamlOutput = yaml.safe_dump(json.load(stream), default_flow_style=False)
     f = open(outputFile,'w')
