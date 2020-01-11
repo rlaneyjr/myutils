@@ -37,6 +37,7 @@ def prettyprint(inputFile, outputFile, fileType):
     """
     Convert from Json to Yaml
     """
+    pass
 
 
 def convertJsonYaml(inputFile, outputFile):
