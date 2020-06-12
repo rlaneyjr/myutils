@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, print_function
 
 from getpass import getpass
 #import logging
+from functools import wraps
 import os
 import signal
 import sys
@@ -66,21 +67,22 @@ def get_creds():
     return username, password
 
 
-def byteify(input):
-    if isinstance(input, dict):
+def byteify(data):
+    if isinstance(data, dict):
         return {byteify(key): byteify(value)
-                for key, value in input.iteritems()}
-    elif isinstance(input, list):
-        return [byteify(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
+                for key, value in data.iteritems()}
+    elif isinstance(data, list):
+        return [byteify(element) for element in data]
+    elif isinstance(data, unicode):
+        return data.encode('utf-8')
     else:
-        return input
+        return data
 
 
 def timerfunc(func):
     """A timer decorator
     """
+    @wraps(func)
     def function_timer(*args, **kwargs):
         """A nested function for timing other functions
         """
